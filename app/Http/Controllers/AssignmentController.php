@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Assignment;
 use App\Models\Section;
 use App\Services\ConflictDetectionService;
+use App\Notifications\NewAssignmentNotification;
 
 class AssignmentController extends Controller
 {
@@ -14,8 +15,15 @@ class AssignmentController extends Controller
      */
     public function create()
     {
-        $sections = Section::where('faculty_id', auth()->id())->with('course')->get();
-        return view('academic.assignments.create', compact('sections'));
+        $facultyId = auth()->id();
+        $sections = Section::where('faculty_id', $facultyId)->with('course')->get();
+        // Fetch assignments deployed by this faculty
+        $recentAssignments = Assignment::whereIn('section_id', $sections->pluck('id'))
+            ->with('section.course', 'submissions')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('academic.assignments.create', compact('sections', 'recentAssignments'));
     }
 
     /**
@@ -44,6 +52,7 @@ class AssignmentController extends Controller
     {
         $validated = $request->validate([
             'section_id' => 'required|exists:sections,id',
+            'type' => 'required|in:Assignment,Quiz',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'weight' => 'required|numeric|min:0|max:100',
@@ -53,9 +62,13 @@ class AssignmentController extends Controller
         ]);
 
         // Security check
-        Section::where('id', $validated['section_id'])->where('faculty_id', auth()->id())->firstOrFail();
+        $section = Section::where('id', $validated['section_id'])->where('faculty_id', auth()->id())->firstOrFail();
 
-        Assignment::create($validated);
+        $assignment = Assignment::create($validated);
+
+        foreach ($section->students as $student) {
+            $student->notify(new NewAssignmentNotification($assignment));
+        }
 
         return redirect()->route('assignments.create')
                          ->with('success', 'Assignment created successfully.');

@@ -12,4 +12,9 @@ class Course extends Model
     {
         return $this->hasMany(Section::class);
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
 }

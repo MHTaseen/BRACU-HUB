@@ -145,6 +145,14 @@
         </div>
 
         <div class="form-group">
+            <label for="type">Task Type</label>
+            <select name="type" id="type" required>
+                <option value="Assignment" {{ old('type') == 'Assignment' ? 'selected' : '' }}>Assignment</option>
+                <option value="Quiz" {{ old('type') == 'Quiz' ? 'selected' : '' }}>Quiz</option>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="title">Mission Title</label>
             <input type="text" name="title" id="title" value="{{ old('title') }}" required placeholder="e.g. Neural Network Architecture">
         </div>
@@ -172,6 +180,32 @@
             DEPLOY ASSIGNMENT
         </button>
     </form>
+</div>
+
+<div class="glass-panel form-card" style="margin-top: 3rem;">
+    <h2 style="color: var(--faculty-neon); margin-bottom: 1.5rem; font-size: 1.25rem;">Active Deployments & Reports</h2>
+    @if(isset($recentAssignments) && $recentAssignments->count() > 0)
+        @foreach($recentAssignments as $assignment)
+            <div style="border-bottom: 1px solid var(--glass-border); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">
+                        {{ $assignment->section->course->code }} • SEC {{ $assignment->section->section_number }}
+                    </div>
+                    <div style="font-weight: 600; font-size: 1.1rem; color: white;">
+                        {{ $assignment->title }}
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem;">
+                        Due: {{ $assignment->due_date->format('M d, Y') }} • {{ $assignment->submissions->count() }} Submissions
+                    </div>
+                </div>
+                <a href="{{ route('faculty.submissions.index', $assignment->id) }}" style="padding: 0.5rem 1rem; border-radius: 6px; background: rgba(168, 85, 247, 0.1); color: var(--faculty-neon); text-decoration: none; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--faculty-neon); transition: 0.2s;">
+                    VIEW REPORTS
+                </a>
+            </div>
+        @endforeach
+    @else
+        <p style="color: var(--text-dim); text-align: center;">No active deployments.</p>
+    @endif
 </div>
 @endsection
 
