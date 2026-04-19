@@ -185,10 +185,49 @@
 @endsection
 
 @section('content')
-<div class="page-header" style="text-align: center;">
+<div class="page-header" style="text-align: center; margin-bottom: 2rem;">
     <h1 class="page-title">Personal <span class="neon-text">Academic Tracker</span></h1>
     <p class="page-subtitle">Your unified command center — attendance, deadlines, and live grade predictions.</p>
+    <div style="margin-top: 1.5rem;">
+        <a href="/api/students/{{ Auth::id() }}/resume/download" target="_blank" class="btn" style="padding: 0.6rem 1.5rem; border-radius: 999px; background: var(--primary-neon); color: #000; font-weight: 700; text-decoration: none; display: inline-block; box-shadow: 0 4px 15px rgba(34, 211, 238, 0.4); transition: transform 0.2s;">📄 Download My Resume</a>
+    </div>
 </div>
+
+{{-- ══ Academic Risk Predictor ════════════════════════════════════════════ --}}
+<div class="glass-panel dashboard-card" style="margin-bottom: 2rem;">
+    <h3 style="color: var(--primary-neon); margin-bottom: 1rem; text-align: center; text-transform: uppercase; letter-spacing: 0.1em; font-size: 1.1rem;">Academic Risk Predictor</h3>
+    <div id="risk-predictor-content" style="display: flex; gap: 2rem; align-items: center; justify-content: center; min-height: 80px;">
+        <span style="color: var(--text-dim);">Analyzing academic performance...</span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/students/{{ Auth::id() }}/academic-risk')
+            .then(response => response.json())
+            .then(data => {
+                const content = document.getElementById('risk-predictor-content');
+                let riskColor = data.risk_level === 'Low' ? '#10b981' : (data.risk_level === 'Medium' ? '#fbbf24' : '#ef4444');
+                content.innerHTML = `
+                    <div style="flex: 1; text-align: center; border-right: 1px solid var(--glass-border);">
+                        <div style="font-size: 2.5rem; font-weight: 800; color: ${riskColor}; text-shadow: 0 0 10px ${riskColor}40;">${data.risk_level}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.5rem;">Overall Risk</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; border-right: 1px solid var(--glass-border);">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">${data.metrics.attendance_percentage}%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.5rem;">Attendance</div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">${data.metrics.late_submission_percentage}%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.5rem;">Late Submissions</div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('risk-predictor-content').innerHTML = '<span style="color: #ef4444;">Failed to load risk data. Please try again later.</span>';
+            });
+    });
+</script>
 
 {{-- ══ Top Section: Global Health & Upcoming Deadlines ══════════════════════ --}}
 <div class="top-panel-grid">
