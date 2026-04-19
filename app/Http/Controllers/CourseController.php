@@ -10,7 +10,12 @@ class CourseController extends Controller
 {
     public function index()
     {
-        $courses = Course::withCount('sections')->get();
+        $facultyId = auth()->id();
+        $courses = Course::withCount('sections')
+                         ->with(['sections' => function($query) use ($facultyId) {
+                             $query->where('faculty_id', $facultyId);
+                         }])
+                         ->get();
         return view('academic.courses.index', compact('courses'));
     }
 

@@ -64,7 +64,20 @@
             <span class="subtext">Active Sections: {{ $course->sections_count }}</span>
         </div>
         <div style="margin-top: 1rem;">
-            <a href="{{ route('sections.create', ['course_id' => $course->id]) }}" style="color: var(--faculty-neon); text-decoration: none; font-size: 0.85rem; font-weight: 600;">+ OPEN SECTION</a>
+            @if($course->sections->count() > 0)
+                <div style="margin-bottom: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <h5 style="color: var(--text-dim); margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase;">Your Sections</h5>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        @foreach($course->sections as $section)
+                            <a href="{{ route('sections.manage', $section->id) }}" style="display: inline-flex; align-items: center; gap: 0.25rem; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--faculty-neon); color: white; padding: 0.3rem 0.7rem; border-radius: 8px; font-size: 0.85rem; text-decoration: none; transition: 0.2s;">
+                                Section {{ $section->section_number }}
+                                <svg style="width: 14px; height: 14px; margin-left: 0.2rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+            <a href="{{ route('sections.create', ['course_id' => $course->id]) }}" style="color: var(--faculty-neon); text-decoration: none; font-size: 0.85rem; font-weight: 600;">+ OPEN NEW SECTION</a>
         </div>
     </div>
     @endforeach

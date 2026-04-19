@@ -248,6 +248,7 @@
                     <a href="{{ route('attendance.create') }}" class="nav-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}">Mark Attendance</a>
                 @else
                     <a href="{{ route('student.tracker') }}" class="nav-link {{ request()->routeIs('student.tracker') ? 'active' : '' }}">Academic Tracker</a>
+                    <a href="{{ route('materials.repository') }}" class="nav-link {{ request()->routeIs('materials.repository') ? 'active' : '' }}">Course Vault</a>
                     <a href="{{ route('revision.index') }}" class="nav-link {{ request()->routeIs('revision.index') ? 'active' : '' }}">Revision Planner</a>
                     <a href="{{ route('assistant.index') }}" class="nav-link {{ request()->routeIs('assistant.*') ? 'active' : '' }}">AI Assistant</a>
                 @endif

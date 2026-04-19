@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Assignment extends Model
 {
-    protected $fillable = ['type', 'section_id', 'title', 'description', 'weight', 'due_date'];
+    protected $fillable = ['type', 'section_id', 'title', 'description', 'weight', 'max_marks', 'due_date'];
 
     protected function casts(): array
     {

@@ -39,4 +39,9 @@ class Section extends Model
             ->withPivot('status')
             ->withTimestamps();
     }
+
+    public function materials()
+    {
+        return $this->hasMany(CourseMaterial::class);
+    }
 }

@@ -52,10 +52,11 @@ class AssignmentController extends Controller
     {
         $validated = $request->validate([
             'section_id' => 'required|exists:sections,id',
-            'type' => 'required|in:Assignment,Quiz',
+            'type' => 'required|in:Assignment,Quiz,Midterm,Final',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'weight' => 'required|numeric|min:0|max:100',
+            'max_marks' => 'required|numeric|min:1|max:1000',
             'due_date' => 'required|date|after:today',
         ], [
             'due_date.after' => 'The assignment due date must be a date after today.',
