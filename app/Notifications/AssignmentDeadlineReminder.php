@@ -13,15 +13,21 @@ class AssignmentDeadlineReminder extends Notification
 {
 
     public $assignment;
-    public $daysLeft;
+    public $timeLeft;
+    public $unit; // 'days' or 'minutes'
 
     /**
      * Create a new notification instance.
+     *
+     * @param Assignment $assignment
+     * @param int        $timeLeft  Number of days or minutes remaining
+     * @param string     $unit      'days' (default) or 'minutes'
      */
-    public function __construct(Assignment $assignment, $daysLeft)
+    public function __construct(Assignment $assignment, $timeLeft, $unit = 'days')
     {
         $this->assignment = $assignment;
-        $this->daysLeft = $daysLeft;
+        $this->timeLeft   = $timeLeft;
+        $this->unit       = $unit;
     }
 
     /**
@@ -35,14 +41,27 @@ class AssignmentDeadlineReminder extends Notification
     }
 
     /**
+     * Human-readable time-left string.
+     */
+    private function timeLeftLabel(): string
+    {
+        if ($this->unit === 'minutes') {
+            return $this->timeLeft . ' minute(s)';
+        }
+        return $this->timeLeft . ' day(s)';
+    }
+
+    /**
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $type = $this->assignment->type ?? 'Assignment';
+        $type  = $this->assignment->type ?? 'Assignment';
+        $label = $this->timeLeftLabel();
+
         return (new MailMessage)
-            ->subject('Deadline Reminder: ' . $this->assignment->title)
-            ->line('URGENT: This is a reminder that your ' . strtolower($type) . ' "' . $this->assignment->title . '" is due in ' . $this->daysLeft . ' day(s)!')
+            ->subject('⏰ Deadline Reminder: ' . $this->assignment->title)
+            ->line('URGENT: Your ' . strtolower($type) . ' "' . $this->assignment->title . '" is due in ' . $label . '!')
             ->action('View Dashboard', url('/dashboard'))
             ->line('Please make sure to submit it on time!');
     }
@@ -54,11 +73,13 @@ class AssignmentDeadlineReminder extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $type = $this->assignment->type ?? 'Assignment';
+        $type  = $this->assignment->type ?? 'Assignment';
+        $label = $this->timeLeftLabel();
+
         return [
             'assignment_id' => $this->assignment->id,
-            'title' => 'Deadline Reminder: ' . $this->assignment->title,
-            'message' => 'Your ' . strtolower($type) . ' is due in ' . $this->daysLeft . ' day(s)!',
+            'title'         => '⏰ Deadline Reminder: ' . $this->assignment->title,
+            'message'       => 'Your ' . strtolower($type) . ' is due in ' . $label . '!',
         ];
     }
 }

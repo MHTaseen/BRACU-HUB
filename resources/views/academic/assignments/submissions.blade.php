@@ -3,6 +3,7 @@
 @section('title', 'View Submissions | BRACU HUB')
 
 @section('extra_css')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     .submission-grid {
         display: grid;
@@ -100,19 +101,92 @@
 
                 @if($sub)
                     <div style="border-top: 1px solid var(--glass-border); margin-top: 1rem; padding-top: 1rem;">
-                        @if($sub->file_path)
-                            <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank" class="file-link">
-                                📎 Download Attached File
-                            </a>
-                        @endif
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                            <div style="flex: 1; min-width: 250px;">
+                                @if($sub->file_path)
+                                    <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank" class="file-link" style="margin-top: 0;">
+                                        📎 Download Attached File
+                                    </a>
+                                @endif
 
-                        @if($sub->content)
-                            <div class="content-box">{{ $sub->content }}</div>
-                        @endif
+                                @if($sub->content)
+                                    <div class="content-box" style="{{ !$sub->file_path ? 'margin-top:0;' : '' }}">{{ $sub->content }}</div>
+                                @endif
+                            </div>
+
+                            {{-- Grading Panel --}}
+                            <div style="background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); padding: 1rem; border-radius: 8px; min-width: 200px;">
+                                <label style="display: block; font-size: 0.75rem; color: var(--faculty-neon); text-transform: uppercase; font-weight: bold; margin-bottom: 0.5rem;">
+                                    Give Marks (Max: {{ $assignment->weight }})
+                                </label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="number" step="0.1" min="0" max="{{ $assignment->weight }}" id="marks-{{ $sub->id }}" value="{{ $sub->marks }}" 
+                                        style="width: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; border-radius: 6px; padding: 0.4rem; text-align: center;">
+                                    <span style="color: var(--text-dim); font-size: 0.9rem;">/ {{ $assignment->weight }}</span>
+                                    <button onclick="saveMarks({{ $sub->id }})" id="btn-marks-{{ $sub->id }}"
+                                        style="padding: 0.4rem 0.8rem; background: var(--faculty-neon); border: none; color: white; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-left: auto;">
+                                        SAVE
+                                    </button>
+                                </div>
+                                <div id="status-{{ $sub->id }}" style="font-size: 0.75rem; margin-top: 0.5rem; min-height: 15px;"></div>
+                            </div>
+                        </div>
                     </div>
                 @endif
             </div>
         @endforeach
     </div>
 </div>
+@endsection
+
+@section('extra_js')
+<script>
+    async function saveMarks(submissionId) {
+        const input = document.getElementById('marks-' + submissionId);
+        const btn = document.getElementById('btn-marks-' + submissionId);
+        const status = document.getElementById('status-' + submissionId);
+        
+        const marks = input.value;
+        const maxMarks = {{ $assignment->weight }};
+
+        if (marks === '') {
+            status.innerHTML = '<span style="color: #f87171;">Please enter a mark.</span>';
+            return;
+        }
+
+        if (parseFloat(marks) < 0 || parseFloat(marks) > maxMarks) {
+            status.innerHTML = '<span style="color: #f87171;">Marks must be between 0 and ' + maxMarks + '.</span>';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '...';
+        status.innerHTML = '';
+
+        try {
+            const response = await fetch(`/submissions/${submissionId}/marks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ marks: marks })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                status.innerHTML = '<span style="color: #10b981;">✅ Saved!</span>';
+            } else {
+                status.innerHTML = `<span style="color: #f87171;">❌ Error: ${data.message || 'Validation failed'}</span>`;
+            }
+        } catch (e) {
+            status.innerHTML = '<span style="color: #f87171;">❌ Network error</span>';
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = 'SAVE';
+    }
+</script>
 @endsection

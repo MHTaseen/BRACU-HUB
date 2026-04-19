@@ -181,26 +181,59 @@
         </button>
     </form>
 </div>
-
 <div class="glass-panel form-card" style="margin-top: 3rem;">
-    <h2 style="color: var(--faculty-neon); margin-bottom: 1.5rem; font-size: 1.25rem;">Active Deployments & Reports</h2>
+    <h2 style="color: var(--faculty-neon); margin-bottom: 1.5rem; font-size: 1.25rem;">Active Deployments &amp; Reports</h2>
     @if(isset($recentAssignments) && $recentAssignments->count() > 0)
         @foreach($recentAssignments as $assignment)
-            <div style="border-bottom: 1px solid var(--glass-border); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">
-                        {{ $assignment->section->course->code }} • SEC {{ $assignment->section->section_number }}
+            <div style="border-bottom: 1px solid var(--glass-border); padding: 1.25rem 0;" id="assignment-block-{{ $assignment->id }}">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">
+                            {{ $assignment->section->course->code }} • SEC {{ $assignment->section->section_number }}
+                        </div>
+                        <div style="font-weight: 600; font-size: 1.1rem; color: white;">
+                            {{ $assignment->title }}
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem;">
+                            Due: {{ $assignment->due_date->format('M d, Y') }} • {{ $assignment->submissions->count() }} Submissions
+                        </div>
                     </div>
-                    <div style="font-weight: 600; font-size: 1.1rem; color: white;">
-                        {{ $assignment->title }}
-                    </div>
-                    <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem;">
-                        Due: {{ $assignment->due_date->format('M d, Y') }} • {{ $assignment->submissions->count() }} Submissions
+                    <div style="display:flex; gap: 0.6rem; align-items: center; flex-wrap:wrap;">
+                        <a href="{{ route('faculty.submissions.index', $assignment->id) }}"
+                           style="padding: 0.5rem 1rem; border-radius: 6px; background: rgba(168, 85, 247, 0.1); color: var(--faculty-neon); text-decoration: none; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--faculty-neon); transition: 0.2s;">
+                            VIEW REPORTS
+                        </a>
+                        <button
+                            onclick="toggleReminderPanel({{ $assignment->id }})"
+                            style="padding: 0.5rem 1rem; border-radius: 6px; background: rgba(251, 191, 36, 0.1); color: #fbbf24; font-size: 0.8rem; font-weight: 600; border: 1px solid #fbbf24; cursor: pointer; transition: 0.2s;"
+                            id="toggle-btn-{{ $assignment->id }}">
+                            📢 SEND REMINDER
+                        </button>
                     </div>
                 </div>
-                <a href="{{ route('faculty.submissions.index', $assignment->id) }}" style="padding: 0.5rem 1rem; border-radius: 6px; background: rgba(168, 85, 247, 0.1); color: var(--faculty-neon); text-decoration: none; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--faculty-neon); transition: 0.2s;">
-                    VIEW REPORTS
-                </a>
+
+                {{-- Manual Reminder Panel (hidden by default) --}}
+                <div id="reminder-panel-{{ $assignment->id }}"
+                     style="display:none; margin-top: 1rem; background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 1.25rem;">
+                    <p style="color: #fbbf24; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        📢 Manual Reminder — {{ $assignment->title }}
+                    </p>
+                    <textarea
+                        id="reminder-msg-{{ $assignment->id }}"
+                        rows="3"
+                        placeholder="Optional message to students (e.g. 'Please submit before midnight!')…"
+                        style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(251,191,36,0.3); border-radius: 8px; padding: 0.75rem; color: white; font-size: 0.9rem; resize: vertical; margin-bottom: 0.75rem;"
+                    ></textarea>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <button
+                            onclick="sendManualReminder({{ $assignment->id }}, '{{ addslashes(route('assignments.send_reminder', $assignment->id)) }}')"
+                            id="send-btn-{{ $assignment->id }}"
+                            style="padding: 0.6rem 1.5rem; border-radius: 8px; background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #1a1a2e; font-weight: 700; font-size: 0.85rem; border: none; cursor: pointer; transition: 0.2s;">
+                            🚀 SEND NOW
+                        </button>
+                        <span id="reminder-status-{{ $assignment->id }}" style="font-size: 0.85rem;"></span>
+                    </div>
+                </div>
             </div>
         @endforeach
     @else
@@ -247,7 +280,7 @@
             if (!response.ok || !contentType || !contentType.includes("application/json")) {
                 let errorTitle = '❌ Radar Malfunction';
                 let errorDetail = 'The HUB core returned an invalid signal.';
-                
+
                 if (response.status === 422 && contentType && contentType.includes("application/json")) {
                     const errorData = await response.json();
                     errorTitle = '⚠️ VALIDATION ERROR';
@@ -291,7 +324,7 @@
 
     sectionSelect.addEventListener('change', checkConflicts);
     dateInput.addEventListener('change', checkConflicts);
-    
+
     // Initial check if values exist (e.g. on validation error redirect)
     if (sectionSelect.value && dateInput.value) {
         checkConflicts();
@@ -301,5 +334,57 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = 'UPLOADING TO HUB...';
     });
+
+    // ─── Manual Reminder functions ────────────────────────────────────────────
+
+    function toggleReminderPanel(assignmentId) {
+        const panel  = document.getElementById('reminder-panel-' + assignmentId);
+        const btn    = document.getElementById('toggle-btn-' + assignmentId);
+        const hidden = panel.style.display === 'none';
+        panel.style.display = hidden ? 'block' : 'none';
+        btn.innerHTML = hidden ? '✖ CLOSE' : '📢 SEND REMINDER';
+    }
+
+    async function sendManualReminder(assignmentId, routeUrl) {
+        const msgInput  = document.getElementById('reminder-msg-' + assignmentId);
+        const sendBtn   = document.getElementById('send-btn-' + assignmentId);
+        const statusEl  = document.getElementById('reminder-status-' + assignmentId);
+        const message   = msgInput.value.trim();
+
+        sendBtn.disabled   = true;
+        sendBtn.innerHTML  = '⏳ Sending...';
+        statusEl.innerHTML = '';
+        statusEl.style.color = '';
+
+        try {
+            const response = await fetch(routeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                statusEl.innerHTML  = data.message;
+                statusEl.style.color = '#34d399';
+                msgInput.value = '';
+            } else {
+                statusEl.innerHTML  = '❌ Failed to send reminder. Please try again.';
+                statusEl.style.color = '#f87171';
+            }
+        } catch (err) {
+            console.error('Reminder Error:', err);
+            statusEl.innerHTML  = '❌ Network error. Please try again.';
+            statusEl.style.color = '#f87171';
+        }
+
+        sendBtn.disabled  = false;
+        sendBtn.innerHTML = '🚀 SEND NOW';
+    }
 </script>
 @endsection

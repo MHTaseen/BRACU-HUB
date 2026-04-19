@@ -7,6 +7,8 @@ use App\Models\Assignment;
 use App\Models\Section;
 use App\Services\ConflictDetectionService;
 use App\Notifications\NewAssignmentNotification;
+use App\Notifications\TeacherManualReminder;
+
 
 class AssignmentController extends Controller
 {
@@ -72,5 +74,32 @@ class AssignmentController extends Controller
 
         return redirect()->route('assignments.create')
                          ->with('success', 'Assignment created successfully.');
+    }
+
+    /**
+     * Teacher manually sends a reminder to all students for a specific assignment.
+     * Can be called as many times as the teacher wants.
+     */
+    public function sendManualReminder(Request $request, Assignment $assignment)
+    {
+        // Security: only the teacher who owns this assignment's section may send
+        Section::where('id', $assignment->section_id)
+               ->where('faculty_id', auth()->id())
+               ->firstOrFail();
+
+        $customMessage = $request->input('message', '');
+        $teacher       = auth()->user();
+        $count         = 0;
+
+        foreach ($assignment->section->students as $student) {
+            $student->notify(new TeacherManualReminder($assignment, $teacher, $customMessage));
+            $count++;
+        }
+
+        return response()->json([
+            'success' => true,
+            'count'   => $count,
+            'message' => "✅ Reminder sent to {$count} student(s) successfully!",
+        ]);
     }
 }
