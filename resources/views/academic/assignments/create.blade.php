@@ -148,7 +148,9 @@
             <label for="type">Task Type</label>
             <select name="type" id="type" required>
                 <option value="Assignment" {{ old('type') == 'Assignment' ? 'selected' : '' }}>Assignment</option>
-                <option value="Quiz" {{ old('type') == 'Quiz' ? 'selected' : '' }}>Quiz</option>
+                <option value="Quiz"       {{ old('type') == 'Quiz'       ? 'selected' : '' }}>Quiz</option>
+                <option value="Midterm"    {{ old('type') == 'Midterm'    ? 'selected' : '' }}>Midterm</option>
+                <option value="Final"      {{ old('type') == 'Final'      ? 'selected' : '' }}>Final</option>
             </select>
         </div>
 
@@ -165,15 +167,20 @@
         <div class="grid-2">
             <div class="form-group">
                 <label for="weight">Impact Weight (%)</label>
-                <input type="number" name="weight" id="weight" step="0.5" min="0" max="100" value="{{ old('weight') }}" required placeholder="15">
+                <input type="number" name="weight" id="weight" step="0.5" min="0" max="100" value="{{ old('weight') }}" required placeholder="e.g. 20">
             </div>
 
             <div class="form-group">
-                <label for="due_date">Deadline (Radar Sync)</label>
-                <input type="date" name="due_date" id="due_date" 
-                       min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}" 
-                       value="{{ old('due_date') }}" required>
+                <label for="max_marks">Max Marks</label>
+                <input type="number" name="max_marks" id="max_marks" step="0.5" min="1" max="1000" value="{{ old('max_marks', 100) }}" required placeholder="e.g. 100">
             </div>
+        </div>
+
+        <div class="form-group">
+            <label for="due_date">Deadline (Radar Sync)</label>
+            <input type="date" name="due_date" id="due_date"
+                   min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}"
+                   value="{{ old('due_date') }}" required>
         </div>
 
         <button type="submit" class="btn-primary" id="submit-btn" disabled>
