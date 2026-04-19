@@ -36,12 +36,16 @@ Route::middleware([
         return response()->json(['success' => true]);
     })->name('notifications.dismiss');
 
+    // Download material (shared between faculty and student)
+    Route::get('/materials/{material}/download', [App\Http\Controllers\CourseMaterialController::class, 'download'])->name('materials.download');
+
     // Faculty Only Routes
     Route::middleware(['role:faculty'])->group(function () {
         Route::get('/assignments/create', [AssignmentController::class, 'create'])->name('assignments.create');
         Route::post('/assignments', [AssignmentController::class, 'store'])->name('assignments.store');
         Route::post('/assignments/check-conflict', [AssignmentController::class, 'checkConflict'])->name('assignments.check_conflict');
         Route::get('/assignments/{assignment}/submissions', [App\Http\Controllers\AssignmentSubmissionController::class, 'indexForFaculty'])->name('faculty.submissions.index');
+        Route::patch('/submissions/{submission}/grade', [App\Http\Controllers\AssignmentSubmissionController::class, 'grade'])->name('submissions.grade');
 
         Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
         Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
@@ -56,6 +60,10 @@ Route::middleware([
         Route::post('/sections', [App\Http\Controllers\SectionController::class, 'store'])->name('sections.store');
         Route::get('/sections/{section}/manage', [App\Http\Controllers\SectionController::class, 'manage'])->name('sections.manage');
         Route::post('/sections/{section}/enroll', [App\Http\Controllers\SectionController::class, 'addStudent'])->name('sections.enroll');
+        
+        // Course Materials Management
+        Route::post('/sections/{section}/materials', [App\Http\Controllers\CourseMaterialController::class, 'store'])->name('materials.store');
+        Route::delete('/materials/{material}', [App\Http\Controllers\CourseMaterialController::class, 'destroy'])->name('materials.destroy');
     });
 
     // Student Only Routes
@@ -67,5 +75,8 @@ Route::middleware([
         Route::get('/revision-planner', [App\Http\Controllers\RevisionPlannerController::class, 'index'])->name('revision.index');
         Route::get('/assistant', [AcademicAssistantController::class, 'index'])->name('assistant.index');
         Route::post('/assistant/ask', [AcademicAssistantController::class, 'ask'])->name('assistant.ask');
+        
+        // Course Materials
+        Route::get('/repository', [App\Http\Controllers\CourseMaterialController::class, 'repository'])->name('materials.repository');
     });
 });
