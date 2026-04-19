@@ -246,10 +246,13 @@
                     <a href="{{ route('courses.index') }}" class="nav-link {{ request()->routeIs('courses.*') || request()->routeIs('sections.*') ? 'active' : '' }}">Curriculum Hub</a>
                     <a href="{{ route('assignments.create') }}" class="nav-link {{ request()->routeIs('assignments.*') ? 'active' : '' }}">Assignments</a>
                     <a href="{{ route('attendance.create') }}" class="nav-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}">Mark Attendance</a>
+                    <a href="{{ route('quiz.grades.index') }}" class="nav-link {{ request()->routeIs('quiz.grades.*') ? 'active' : '' }}">Quiz Grades</a>
                 @else
                     <a href="{{ route('student.tracker') }}" class="nav-link {{ request()->routeIs('student.tracker') ? 'active' : '' }}">Academic Tracker</a>
                     <a href="{{ route('revision.index') }}" class="nav-link {{ request()->routeIs('revision.index') ? 'active' : '' }}">Revision Planner</a>
                     <a href="{{ route('assistant.index') }}" class="nav-link {{ request()->routeIs('assistant.*') ? 'active' : '' }}">AI Assistant</a>
+                    <a href="{{ route('study-rooms.index') }}" class="nav-link {{ request()->routeIs('study-rooms.*') ? 'active' : '' }}">Study Rooms</a>
+                    <a href="{{ route('peer.suggestions') }}" class="nav-link {{ request()->routeIs('peer.suggestions') ? 'active' : '' }}">Find Partners</a>
                 @endif
                 <a href="{{ route('calendar.index') }}" class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}">Academic Calendar</a>
                 <a href="{{ route('concept-map.index') }}" class="nav-link {{ request()->routeIs('concept-map.index') ? 'active' : '' }}">Concept Map</a>

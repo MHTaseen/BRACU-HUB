@@ -18,6 +18,9 @@
                     <x-nav-link href="{{ route('concept-map.index') }}" :active="request()->routeIs('concept-map.index')">
                         {{ __('Concept Map') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('study-rooms.index') }}" :active="request()->routeIs('study-rooms.*')">
+                        {{ __('Study Rooms') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -220,7 +223,16 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <!-- Account Management -->
+                    <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('concept-map.index') }}" :active="request()->routeIs('concept-map.index')">
+                        {{ __('Concept Map') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link href="{{ route('study-rooms.index') }}" :active="request()->routeIs('study-rooms.*')">
+                        {{ __('Study Rooms') }}
+                    </x-responsive-nav-link>
+
                 <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
