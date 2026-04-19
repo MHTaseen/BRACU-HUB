@@ -249,6 +249,7 @@
                     <a href="{{ route('quiz.grades.index') }}" class="nav-link {{ request()->routeIs('quiz.grades.*') ? 'active' : '' }}">Quiz Grades</a>
                 @else
                     <a href="{{ route('student.tracker') }}" class="nav-link {{ request()->routeIs('student.tracker') ? 'active' : '' }}">Academic Tracker</a>
+                    <a href="{{ route('materials.repository') }}" class="nav-link {{ request()->routeIs('materials.repository') ? 'active' : '' }}">Course Vault</a>
                     <a href="{{ route('revision.index') }}" class="nav-link {{ request()->routeIs('revision.index') ? 'active' : '' }}">Revision Planner</a>
                     <a href="{{ route('assistant.index') }}" class="nav-link {{ request()->routeIs('assistant.*') ? 'active' : '' }}">AI Assistant</a>
                     <a href="{{ route('study-rooms.index') }}" class="nav-link {{ request()->routeIs('study-rooms.*') ? 'active' : '' }}">Study Rooms</a>

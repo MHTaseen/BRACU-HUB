@@ -63,4 +63,30 @@ class AssignmentSubmissionController extends Controller
 
         return view('academic.assignments.submissions', compact('assignment'));
     }
+
+    /**
+     * Faculty grades a specific student submission.
+     */
+    public function grade(Request $request, AssignmentSubmission $submission)
+    {
+        // Security: Ensure the logged-in faculty owns the section this submission belongs to
+        if ($submission->assignment->section->faculty_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'marks_obtained' => [
+                'required',
+                'numeric',
+                'min:0',
+                'max:' . $submission->assignment->max_marks,
+            ],
+        ], [
+            'marks_obtained.max' => 'Marks cannot exceed the maximum of ' . $submission->assignment->max_marks . '.',
+        ]);
+
+        $submission->update(['marks_obtained' => $request->marks_obtained]);
+
+        return back()->with('grade_success', 'Marks saved for ' . $submission->student->name . '!');
+    }
 }
