@@ -192,7 +192,7 @@
                 @if($sub)
                     <div style="border-top: 1px solid var(--glass-border); margin-top: 1rem; padding-top: 1rem;">
                         @if($sub->file_path)
-                            <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank" class="file-link">
+                            <a href="{{ route('submissions.download', $sub->id) }}" target="_blank" class="file-link">
                                 📎 Download Attached File
                             </a>
                         @endif

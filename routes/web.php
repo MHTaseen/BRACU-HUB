@@ -38,6 +38,7 @@ Route::middleware([
 
     // Download material (shared between faculty and student)
     Route::get('/materials/{material}/download', [App\Http\Controllers\CourseMaterialController::class, 'download'])->name('materials.download');
+    Route::get('/submissions/{submission}/download', [App\Http\Controllers\AssignmentSubmissionController::class, 'download'])->name('submissions.download');
 
     // Faculty Only Routes
     Route::middleware(['role:faculty'])->group(function () {

@@ -45,7 +45,7 @@
         <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(34, 211, 238, 0.05); border: 1px solid rgba(34, 211, 238, 0.2); border-radius: 8px;">
             <span style="font-size: 1.5rem;">📎</span>
             <span style="flex-grow: 1; font-family: monospace;">{{ basename($submission->file_path) }}</span>
-            <a href="{{ asset('storage/' . $submission->file_path) }}" target="_blank" style="padding: 0.4rem 1rem; background: var(--primary-neon); color: black; font-weight: bold; font-size: 0.75rem; border-radius: 4px; text-decoration: none;">DOWNLOAD / VIEW</a>
+            <a href="{{ route('submissions.download', $submission->id) }}" target="_blank" style="padding: 0.4rem 1rem; background: var(--primary-neon); color: black; font-weight: bold; font-size: 0.75rem; border-radius: 4px; text-decoration: none;">DOWNLOAD / VIEW</a>
         </div>
     </div>
     @endif
