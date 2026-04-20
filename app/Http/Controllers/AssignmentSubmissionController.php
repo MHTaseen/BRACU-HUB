@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\MarksUpdatedNotification;
 
 class AssignmentSubmissionController extends Controller
 {
@@ -63,6 +64,34 @@ class AssignmentSubmissionController extends Controller
         $assignment->load(['submissions.student', 'section.students']);
 
         return view('academic.assignments.submissions', compact('assignment'));
+    }
+
+    public function updateMarks(Request $request, AssignmentSubmission $submission)
+    {
+        // Ensure faculty owns the section of this assignment
+        $assignment = $submission->assignment;
+        if ($assignment->section->faculty_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $maxMarks = $assignment->weight;
+
+        $request->validate([
+            'marks' => "required|numeric|min:0|max:{$maxMarks}"
+        ], [
+            'marks.max' => "Marks cannot exceed the total weight ({$maxMarks})."
+        ]);
+
+        $submission->update([
+            'marks' => $request->input('marks')
+        ]);
+
+        $submission->student->notify(new MarksUpdatedNotification($submission));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Marks updated successfully!'
+        ]);
     }
 
     /**
