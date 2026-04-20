@@ -34,7 +34,7 @@ class AssignmentController extends Controller
     {
         $request->validate([
             'section_id' => 'required|exists:sections,id',
-            'due_date' => 'required|date|after:today'
+            'due_date' => 'required|date|after:now'
         ]);
 
         // Security check
@@ -57,9 +57,9 @@ class AssignmentController extends Controller
             'description' => 'nullable|string',
             'weight' => 'required|numeric|min:0|max:100',
             'max_marks' => 'required|numeric|min:1|max:1000',
-            'due_date' => 'required|date|after:today',
+            'due_date' => 'required|date|after:now',
         ], [
-            'due_date.after' => 'The assignment due date must be a date after today.',
+            'due_date.after' => 'The assignment due date must be in the future.',
         ]);
 
         // Security check

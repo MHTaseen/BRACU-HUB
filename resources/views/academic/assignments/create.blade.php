@@ -178,9 +178,9 @@
 
         <div class="form-group">
             <label for="due_date">Deadline (Radar Sync)</label>
-            <input type="date" name="due_date" id="due_date"
-                   min="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}"
-                   value="{{ old('due_date') }}" required>
+            <input type="datetime-local" name="due_date" id="due_date"
+                   min="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}"
+                   value="{{ old('due_date') ? \Carbon\Carbon::parse(old('due_date'))->format('Y-m-d\TH:i') : '' }}" required>
         </div>
 
         <button type="submit" class="btn-primary" id="submit-btn" disabled>
@@ -202,7 +202,7 @@
                         {{ $assignment->title }}
                     </div>
                     <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem;">
-                        Due: {{ $assignment->due_date->format('M d, Y') }} • {{ $assignment->submissions->count() }} Submissions
+                        Due: {{ $assignment->due_date->format('M d, Y h:i A') }} • {{ $assignment->submissions->count() }} Submissions
                     </div>
                 </div>
                 <a href="{{ route('faculty.submissions.index', $assignment->id) }}" style="padding: 0.5rem 1rem; border-radius: 6px; background: rgba(168, 85, 247, 0.1); color: var(--faculty-neon); text-decoration: none; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--faculty-neon); transition: 0.2s;">
