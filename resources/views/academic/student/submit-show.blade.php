@@ -36,7 +36,16 @@
                 @endif
             </div>
         </div>
-        <a href="{{ route('student.tracker') }}" style="padding: 0.5rem 1rem; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; text-decoration: none; font-size: 0.85rem;">Back to Tracker</a>
+        
+        <div style="text-align: right;">
+            @if($submission->marks !== null)
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: bold; margin-bottom: 1rem; display: inline-block;">
+                    Score: {{ $submission->marks }} / {{ $submission->assignment->weight }}
+                </div>
+                <br>
+            @endif
+            <a href="{{ route('student.tracker') }}" style="padding: 0.5rem 1rem; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; text-decoration: none; font-size: 0.85rem;">Back to Tracker</a>
+        </div>
     </div>
 
     @if($submission->file_path)
@@ -45,7 +54,7 @@
         <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(34, 211, 238, 0.05); border: 1px solid rgba(34, 211, 238, 0.2); border-radius: 8px;">
             <span style="font-size: 1.5rem;">📎</span>
             <span style="flex-grow: 1; font-family: monospace;">{{ basename($submission->file_path) }}</span>
-            <a href="{{ asset('storage/' . $submission->file_path) }}" target="_blank" style="padding: 0.4rem 1rem; background: var(--primary-neon); color: black; font-weight: bold; font-size: 0.75rem; border-radius: 4px; text-decoration: none;">DOWNLOAD / VIEW</a>
+            <a href="{{ route('submissions.download', $submission->id) }}" target="_blank" style="padding: 0.4rem 1rem; background: var(--primary-neon); color: black; font-weight: bold; font-size: 0.75rem; border-radius: 4px; text-decoration: none;">DOWNLOAD / VIEW</a>
         </div>
     </div>
     @endif

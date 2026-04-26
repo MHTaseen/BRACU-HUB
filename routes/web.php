@@ -48,6 +48,7 @@ Route::middleware([
 
     // Download material (shared between faculty and student)
     Route::get('/materials/{material}/download', [App\Http\Controllers\CourseMaterialController::class, 'download'])->name('materials.download');
+    Route::get('/submissions/{submission}/download', [App\Http\Controllers\AssignmentSubmissionController::class, 'download'])->name('submissions.download');
 
     // Faculty Only Routes
     Route::middleware(['role:faculty'])->group(function () {
@@ -55,6 +56,8 @@ Route::middleware([
         Route::post('/assignments', [AssignmentController::class, 'store'])->name('assignments.store');
         Route::post('/assignments/check-conflict', [AssignmentController::class, 'checkConflict'])->name('assignments.check_conflict');
         Route::get('/assignments/{assignment}/submissions', [App\Http\Controllers\AssignmentSubmissionController::class, 'indexForFaculty'])->name('faculty.submissions.index');
+        Route::post('/submissions/{submission}/marks', [App\Http\Controllers\AssignmentSubmissionController::class, 'updateMarks'])->name('faculty.submissions.marks');
+        Route::post('/assignments/{assignment}/send-reminder', [AssignmentController::class, 'sendManualReminder'])->name('assignments.send_reminder');
         Route::patch('/submissions/{submission}/grade', [App\Http\Controllers\AssignmentSubmissionController::class, 'grade'])->name('submissions.grade');
 
         Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');

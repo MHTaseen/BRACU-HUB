@@ -3,6 +3,7 @@
 @section('title', 'View Submissions | BRACU HUB')
 
 @section('extra_css')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     .submission-grid {
         display: grid;
@@ -192,13 +193,13 @@
                 @if($sub)
                     <div style="border-top: 1px solid var(--glass-border); margin-top: 1rem; padding-top: 1rem;">
                         @if($sub->file_path)
-                            <a href="{{ asset('storage/' . $sub->file_path) }}" target="_blank" class="file-link">
+                            <a href="{{ route('submissions.download', $sub->id) }}" target="_blank" class="file-link" style="margin-top: 0;">
                                 📎 Download Attached File
                             </a>
                         @endif
 
                         @if($sub->content)
-                            <div class="content-box">{{ $sub->content }}</div>
+                            <div class="content-box" style="{{ !$sub->file_path ? 'margin-top:0;' : '' }}">{{ $sub->content }}</div>
                         @endif
 
                         {{-- ── Grade Entry Panel ── --}}
@@ -208,7 +209,7 @@
                                     <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Marks Awarded</div>
                                     <span class="marks-display">{{ $sub->marks_obtained }} / {{ $assignment->max_marks }}</span>
                                     <span style="font-size: 0.85rem; color: var(--text-dim); margin-left: 0.5rem;">
-                                        ({{ round(($sub->marks_obtained / $assignment->max_marks) * 100, 1) }}%)
+                                        ({{ round(($sub->marks_obtained / max($assignment->max_marks, 1)) * 100, 1) }}%)
                                     </span>
                                 </div>
                                 <div style="flex: 1;"></div>
@@ -244,4 +245,56 @@
         @endforeach
     </div>
 </div>
+@endsection
+
+@section('extra_js')
+<script>
+    async function saveMarks(submissionId) {
+        const input = document.getElementById('marks-' + submissionId);
+        const btn = document.getElementById('btn-marks-' + submissionId);
+        const status = document.getElementById('status-' + submissionId);
+        
+        const marks = input.value;
+        const maxMarks = {{ $assignment->weight }};
+
+        if (marks === '') {
+            status.innerHTML = '<span style="color: #f87171;">Please enter a mark.</span>';
+            return;
+        }
+
+        if (parseFloat(marks) < 0 || parseFloat(marks) > maxMarks) {
+            status.innerHTML = '<span style="color: #f87171;">Marks must be between 0 and ' + maxMarks + '.</span>';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '...';
+        status.innerHTML = '';
+
+        try {
+            const response = await fetch(`/submissions/${submissionId}/marks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ marks: marks })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                status.innerHTML = '<span style="color: #10b981;">✅ Saved!</span>';
+            } else {
+                status.innerHTML = `<span style="color: #f87171;">❌ Error: ${data.message || 'Validation failed'}</span>`;
+            }
+        } catch (e) {
+            status.innerHTML = '<span style="color: #f87171;">❌ Network error</span>';
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = 'SAVE';
+    }
+</script>
 @endsection
