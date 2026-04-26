@@ -25,6 +25,16 @@ Route::middleware([
     // Shared Routes
     Route::get('/calendar', [AcademicCalendarController::class, 'index'])->name('calendar.index');
     Route::get('/concept-map', [App\Http\Controllers\ConceptMapController::class, 'index'])->name('concept-map.index');
+    Route::get('/study-rooms', [App\Http\Controllers\StudyRoomController::class, 'index'])->name('study-rooms.index');
+    Route::get('/study-rooms/create', [App\Http\Controllers\StudyRoomController::class, 'create'])->name('study-rooms.create');
+    Route::post('/study-rooms', [App\Http\Controllers\StudyRoomController::class, 'store'])->name('study-rooms.store');
+    Route::get('/study-rooms/{studyRoom}', [App\Http\Controllers\StudyRoomController::class, 'show'])->name('study-rooms.show');
+    Route::post('/study-rooms/{studyRoom}/leave', [App\Http\Controllers\StudyRoomController::class, 'leave'])->name('study-rooms.leave');
+    Route::post('/study-rooms/{studyRoom}/archive', [App\Http\Controllers\StudyRoomController::class, 'archive'])->name('study-rooms.archive');
+    Route::post('/study-rooms/{studyRoom}/notes', [App\Http\Controllers\StudyRoomController::class, 'updateNotes'])->name('study-rooms.update-notes');
+    Route::post('/study-rooms/{studyRoom}/whiteboard', [App\Http\Controllers\StudyRoomController::class, 'updateWhiteboard'])->name('study-rooms.update-whiteboard');
+    Route::get('/study-rooms/{studyRoom}/updates', [App\Http\Controllers\StudyRoomController::class, 'getUpdates'])->name('study-rooms.get-updates');
+    Route::post('/study-rooms/{studyRoom}/message', [App\Http\Controllers\StudyRoomController::class, 'sendMessage'])->name('study-rooms.send-message');
     Route::post('/notifications/mark-read', function () {
         auth()->user()->unreadNotifications->markAsRead();
         return back();
@@ -53,6 +63,10 @@ Route::middleware([
         Route::get('/attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
         Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
 
+        // Quiz Grading (Sadman — Module 2 Revision Planner feature)
+        Route::get('/quiz-grades', [App\Http\Controllers\QuizGradeController::class, 'index'])->name('quiz.grades.index');
+        Route::post('/assignments/{assignment}/grade', [App\Http\Controllers\QuizGradeController::class, 'store'])->name('quiz.grades.store');
+
         // Course Management
         Route::get('/courses', [App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
         Route::get('/courses/create', [App\Http\Controllers\CourseController::class, 'create'])->name('courses.create');
@@ -76,7 +90,9 @@ Route::middleware([
         Route::post('/submissions/{assignment}', [App\Http\Controllers\AssignmentSubmissionController::class, 'store'])->name('submissions.store');
         Route::get('/submissions/{submission}/show', [App\Http\Controllers\AssignmentSubmissionController::class, 'show'])->name('submissions.show');
         Route::get('/revision-planner', [App\Http\Controllers\RevisionPlannerController::class, 'index'])->name('revision.index');
+        Route::get('/wiki-summary', [App\Http\Controllers\RevisionPlannerController::class, 'wikiSummary'])->name('wiki.summary');
         Route::get('/assistant', [AcademicAssistantController::class, 'index'])->name('assistant.index');
+        Route::get('/peer-suggestions', [App\Http\Controllers\PeerSuggestionController::class, 'index'])->name('peer.suggestions');
         Route::post('/assistant/ask', [AcademicAssistantController::class, 'ask'])->name('assistant.ask');
         
         // Course Materials

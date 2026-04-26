@@ -37,6 +37,11 @@
                 </svg>
             </a>
         </p>
+        <p class="mt-6 text-sm">
+            <a href="{{ route('study-rooms.index') }}" class="inline-flex items-center font-semibold text-gray-900 bg-blue-100 border border-blue-200 rounded-lg px-4 py-2 hover:bg-blue-200">
+                Open Study Rooms
+            </a>
+        </p>
     </div>
 
     <div>
