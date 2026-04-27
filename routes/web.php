@@ -6,6 +6,13 @@ use App\Http\Controllers\AcademicCalendarController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AcademicAssistantController;
+
+Route::get('/setup-database', function () {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    return 'Database migrated and seeded successfully!';
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -20,12 +27,6 @@ Route::middleware([
 
     Route::get('/', function () {
         return redirect()->route('dashboard');
-    });
-
-    Route::get('/setup-database', function () {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        return 'Database migrated and seeded successfully!';
     });
 
     // Shared Routes
