@@ -22,6 +22,12 @@ Route::middleware([
         return redirect()->route('dashboard');
     });
 
+    Route::get('/setup-database', function () {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return 'Database migrated and seeded successfully!';
+    });
+
     // Shared Routes
     Route::get('/calendar', [AcademicCalendarController::class, 'index'])->name('calendar.index');
     Route::get('/concept-map', [App\Http\Controllers\ConceptMapController::class, 'index'])->name('concept-map.index');
