@@ -1,0 +1,27 @@
+{
+    "version": 2,
+    "framework": null,
+    "installCommand": "composer install && npm install",
+    "buildCommand": "npm run build",
+    "outputDirectory": "public",
+    "builders": [
+        {
+            "src": "public/index.php",
+            "use": "@vercel/php"
+        },
+        {
+            "src": "public/**",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/build/(.*)",
+            "dest": "/public/build/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/public/index.php"
+        }
+    ]
+}
